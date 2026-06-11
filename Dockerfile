@@ -1,4 +1,6 @@
-FROM ubuntu:22.04@sha256:ce4a593b4e323dcc3dd728e397e0a866a1bf516a1b7c31d6aa06991baec4f2e0 as prometheus-cpp-builder
+#FROM ubuntu:22.04@sha256:ce4a593b4e323dcc3dd728e397e0a866a1bf516a1b7c31d6aa06991baec4f2e0 AS prometheus-cpp-builder
+FROM ubuntu:22.04 AS prometheus-cpp-builder
+
 
 RUN apt update && export DEBIAN_FRONTEND=noninteractive && \
     apt install -y curl git cmake build-essential file zlib1g-dev && rm -rf /var/lib/apt/lists/*
@@ -18,7 +20,9 @@ RUN git clone https://github.com/jupp0r/prometheus-cpp -b ${PROMETHEUS_CPP_VERSI
     cd - && \
     rm -rf /tmp/prometheus-cpp
 
-FROM ghcr.io/robotastic/trunk-recorder:edge@sha256:a104309dd07ffb2c6cfcf13da4fc634eb35278749b34a2a55d67f3507a581ab9
+#FROM ghcr.io/robotastic/trunk-recorder:edge@sha256:a104309dd07ffb2c6cfcf13da4fc634eb35278749b34a2a55d67f3507a581ab9
+FROM ghcr.io/robotastic/trunk-recorder:latest
+
 
 COPY --from=prometheus-cpp-builder /prometheus-cpp.deb /tmp/prometheus-cpp.deb
 RUN apt update && export DEBIAN_FRONTEND=noninteractive && \
@@ -41,9 +45,17 @@ RUN mv /etc/gnuradio/conf.d/gnuradio-runtime.conf /tmp/gnuradio-runtime.conf && 
         libssl-dev \
         build-essential \
         gnuradio-dev \
+        gr-osmosdr \
         libuhd-dev \
         libcurl4-openssl-dev \
         libsndfile1-dev && \
+    git clone --depth=1 https://github.com/robotastic/trunk-recorder /tmp/trunk-recorder && \
+    mkdir -p /usr/local/include/op25_repeater/include/op25_repeater && \
+    cp -r /tmp/trunk-recorder/lib/lfsr /usr/local/include/ && \
+    cp /tmp/trunk-recorder/lib/json.hpp /usr/local/include/ && \
+    cp /tmp/trunk-recorder/lib/op25_repeater/include/op25_repeater/*.h /usr/local/include/op25_repeater/ && \
+    cp /tmp/trunk-recorder/lib/op25_repeater/include/op25_repeater/*.h /usr/local/include/op25_repeater/include/op25_repeater/ && \
+    rm -rf /tmp/trunk-recorder && \
     cmake .. && make install && \
     apt-get purge -y git cmake make libssl-dev build-essential gnuradio-dev libuhd-dev libcurl4-openssl-dev libsndfile1-dev && \
     mv /tmp/gnuradio-runtime.conf /etc/gnuradio/conf.d/gnuradio-runtime.conf && \
