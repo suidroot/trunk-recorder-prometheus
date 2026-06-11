@@ -65,8 +65,10 @@ WORKDIR /src/trunk-recorder-prometheus/build
 
 # gnuradio-runtime.conf is temporarily moved aside because gnuradio reads it
 # at cmake configure time and produces a spurious error in a build environment.
+# Plugin is installed into /staging so the final stage can COPY the whole
+# directory without needing to know the exact .so filename.
 RUN mv /etc/gnuradio/conf.d/gnuradio-runtime.conf /tmp/gnuradio-runtime.conf && \
-    cmake .. && make -j$(nproc) && make install && \
+    cmake -DCMAKE_INSTALL_PREFIX=/staging .. && make -j$(nproc) && make install && \
     mv /tmp/gnuradio-runtime.conf /etc/gnuradio/conf.d/gnuradio-runtime.conf
 
 
@@ -79,7 +81,6 @@ RUN apt-get update && export DEBIAN_FRONTEND=noninteractive && \
     apt-get install --no-install-recommends -y /tmp/prometheus-cpp.deb && \
     rm -rf /var/lib/apt/lists/* /tmp/prometheus-cpp.deb
 
-COPY --from=plugin-builder /usr/local/lib/trunk-recorder/prometheus_plugin.so \
-                            /usr/local/lib/trunk-recorder/
+COPY --from=plugin-builder /staging/lib/trunk-recorder/ /usr/local/lib/trunk-recorder/
 
 WORKDIR /app
