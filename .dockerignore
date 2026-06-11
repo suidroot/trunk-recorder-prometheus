@@ -1,6 +1,10 @@
 build/
+.git/
+.github/
 .gitignore
+.claude/
 config.json
 Dockerfile
 README.md
+grafana/
 trunk-recorder/

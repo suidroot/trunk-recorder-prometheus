@@ -93,4 +93,6 @@ services:
       - /var/run/dbus:/var/run/dbus
       - /var/run/avahi-daemon/socket:/var/run/avahi-daemon/socket
       - ./:/app
+    ports:
+     - 9842:9842
 ```
