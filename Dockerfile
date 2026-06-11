@@ -1,7 +1,7 @@
-FROM ubuntu:24.04 AS prometheus-cpp-builder
+FROM ubuntu:22.04 AS prometheus-cpp-builder
 # Build prometheus-cpp and package it as a .deb.
-# Uses plain ubuntu:24.04 (not the full trunk-recorder image) since only
-# cmake and a C++ compiler are needed here.
+# Uses ubuntu:22.04 to match the trunk-recorder:latest base OS so the
+# resulting .deb is compatible with the final image's libc6.
 
 RUN apt-get update && export DEBIAN_FRONTEND=noninteractive && \
     apt-get install --no-install-recommends -y \
