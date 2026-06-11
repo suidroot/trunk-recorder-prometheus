@@ -33,7 +33,7 @@ COPY --from=prometheus-cpp-builder /prometheus-cpp.deb /tmp/prometheus-cpp.deb
 # Docker can cache this layer independently of source code changes.
 RUN apt-get update && export DEBIAN_FRONTEND=noninteractive && \
     apt-get install --no-install-recommends -y /tmp/prometheus-cpp.deb && \
-    apt-get install --no-install-recommends --no-install-suggests -y \
+    apt-get -o Dpkg::Options::="--force-confold" install --no-install-recommends --no-install-suggests -y \
         git \
         cmake \
         make \
