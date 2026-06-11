@@ -5,7 +5,7 @@ FROM ubuntu:24.04 AS prometheus-cpp-builder
 
 RUN apt-get update && export DEBIAN_FRONTEND=noninteractive && \
     apt-get install --no-install-recommends -y \
-        curl git cmake build-essential file zlib1g-dev && \
+        ca-certificates curl git cmake build-essential file zlib1g-dev && \
     rm -rf /var/lib/apt/lists/*
 
 # renovate: datasource=github-tags depName=jupp0r/prometheus-cpp
